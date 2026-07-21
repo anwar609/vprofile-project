@@ -23,6 +23,27 @@ pipeline {
                     sh 'mvn -s settings.xml -DskipTests install'
                 }
             }
+            post {
+                success {
+                    echo 'Now Archiving.'
+                    archiveArtifacts artifacts: '**/target/*.war'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexuslogin',
+                        usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                    sh 'mvn -s settings.xml test'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished with status: ${currentBuild.currentResult}"
         }
     }
 }
