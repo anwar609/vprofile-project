@@ -39,6 +39,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Checkstyle Analysis') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexuslogin',
+                        usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                    sh 'mvn -s settings.xml checkstyle:checkstyle'
+                }
+            }
+            post {
+                success {
+                    echo 'Checkstyle analysis complete.'
+                }
+            }
+        }
     }
 
     post {
